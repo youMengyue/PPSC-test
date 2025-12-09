@@ -8,18 +8,6 @@
 
 ---
 
-## Table of Contents
-
-1. [Quick Start](#quick-start)
-2. [Project Overview](#project-overview)
-3. [Build Instructions](#build-instructions)
-4. [Running the Program](#running-the-program)
-5. [Implementation Details](#implementation-details)
-6. [Performance Analysis](#performance-analysis)
-7. [Technical Requirements](#technical-requirements)
-
----
-
 ## Quick Start
 
 ### Compile and Run Both Versions
@@ -80,26 +68,26 @@ Both modes output the result with **20 decimal places** precision and measure ex
 
 ### Available Make Targets
 
-| Command | Description |
-|---------|-------------|
-| `make all` | Build both sequential and parallel versions (default) |
-| `make sequential` | Build only the sequential version |
-| `make parallel` | Build only the parallel version |
-| `make parallel NUM_THREADS=8` | Build parallel version with 8 threads |
-| `make clean` | Remove all compiled executables |
-| `make help` | Display detailed help information |
+- `make` or `make all` - Build both sequential and parallel versions (default)
+- `make run-seq` - Build and run sequential version
+- `make run-par` - Build and run parallel version
+- `make run-all` - Build and run both versions
+- `make clean` - Remove all compiled executables
+
+You can also specify the number of threads when building:
+- `make PAR_TARGET NUM_THREADS=8` - Build parallel version with 8 threads
 
 ### Build Examples
 
 ```bash
-# Build both versions with default settings
+# Build both versions
 make
 
-# Build parallel version with 8 threads
-make parallel NUM_THREADS=8
+# Build and run all
+make run-all
 
-# Build with custom compiler
-CXX=clang++ make all
+# Clean and rebuild
+make clean && make
 ```
 
 ---
