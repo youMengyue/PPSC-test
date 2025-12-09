@@ -10,32 +10,18 @@
 
 ## Quick Start
 
-### Compile and Run Both Versions
-
 ```bash
 # Build both sequential and parallel versions
-make all
+make
 
-# Run sequential version
-./harmonic_seq
-
-# Run parallel version
-./harmonic_par
-
-# Or use make commands
+# Run both versions
 make run-all
-```
 
-### Benchmark Performance
+# Run individual versions
+./harmonic_seq    # Sequential version
+./harmonic_par    # Parallel version
 
-```bash
-# Run both versions 3 times each for comparison
-make benchmark
-```
-
-### Clean Build Artifacts
-
-```bash
+# Clean build files
 make clean
 ```
 
@@ -63,48 +49,51 @@ Both modes output the result with **20 decimal places** precision and measure ex
 ### Prerequisites
 
 - **C++ Compiler**: g++ or clang++ with C++11 support
-- **OpenMP**: Required for parallel version (typically included with GCC)
+- **OpenMP**: Required for parallel version (included with GCC)
 - **Make**: GNU Make build system
 
-### Available Make Targets
-
-- `make` or `make all` - Build both sequential and parallel versions (default)
-- `make run-seq` - Build and run sequential version
-- `make run-par` - Build and run parallel version
-- `make run-all` - Build and run both versions
-- `make clean` - Remove all compiled executables
-
-You can also specify the number of threads when building:
-- `make PAR_TARGET NUM_THREADS=8` - Build parallel version with 8 threads
-
-### Build Examples
+### Makefile Targets
 
 ```bash
-# Build both versions
-make
+make              # Build both versions (default)
+make run-seq      # Build and run sequential version
+make run-par      # Build and run parallel version
+make run-all      # Build and run both versions
+make clean        # Remove compiled executables
+```
 
-# Build and run all
-make run-all
+### Build with Custom Thread Count
 
-# Clean and rebuild
-make clean && make
+```bash
+# Build parallel version with 8 threads
+make PAR_TARGET NUM_THREADS=8
+```
+
+### Manual Compilation
+
+If you prefer to compile manually without Make:
+
+```bash
+# Sequential version
+g++ -std=c++11 -Wall -O2 harmonic_sum.cpp -o harmonic_seq
+
+# Parallel version with 4 threads
+g++ -std=c++11 -Wall -O2 -fopenmp -DUSE_PARALLEL -DNUM_THREADS=4 harmonic_sum.cpp -o harmonic_par
 ```
 
 ---
 
 ## Running the Program
 
-### Run Sequential Version
+### Sequential Version
 
 ```bash
-# Method 1: Direct execution
-./harmonic_seq
-
-# Method 2: Using make
 make run-seq
+# or
+./harmonic_seq
 ```
 
-**Expected Output:**
+**Output:**
 ```
 ================================================
 Harmonic Series Summation Program
@@ -117,22 +106,20 @@ Mode: Sequential
 ================================================
 
 Computation completed!
-Execution time: 0.0122752 seconds
+Execution time: 0.0120235 seconds
 Result: 16.69531136585996478061
 ================================================
 ```
 
-### Run Parallel Version
+### Parallel Version
 
 ```bash
-# Method 1: Direct execution
-./harmonic_par
-
-# Method 2: Using make
 make run-par
+# or
+./harmonic_par
 ```
 
-**Expected Output:**
+**Output:**
 ```
 ================================================
 Harmonic Series Summation Program
@@ -146,20 +133,18 @@ Number of threads: 4
 ================================================
 
 Computation completed!
-Execution time: 0.0123459 seconds
+Execution time: 0.0130872 seconds
 Result: 16.69531136585979425035
 ================================================
 ```
 
-### Run Both Versions for Comparison
+### Run Both Versions
 
 ```bash
-# Run both versions sequentially
 make run-all
-
-# Run multiple times for benchmarking
-make benchmark
 ```
+
+This will run both the sequential and parallel versions consecutively for easy comparison.
 
 ---
 
@@ -297,44 +282,57 @@ std::cout << "Result: " << result << std::endl;
 
 ## Performance Analysis
 
-### Expected Behavior
+### Expected Results
 
-**Important Note:** Due to the nature of this problem, parallel version may NOT show significant speedup:
+The parallel and sequential versions have **similar execution times** (~0.012 seconds). This is expected and demonstrates an important lesson in parallel computing.
 
-1. **Low computational intensity**
+**Typical Results:**
+```
+Sequential: 0.012 seconds
+Parallel:   0.013 seconds (similar or slightly slower)
+```
+
+### Why Parallel Is Not Faster?
+
+This is **normal behavior** for this particular problem:
+
+1. **Low Computational Intensity**
    - Each iteration: one division + one addition
-   - Very little actual computation per element
-   - Memory bandwidth is not a bottleneck
+   - Operations are extremely fast on modern CPUs
+   - Calculation time << parallelization overhead
 
-2. **Task creation overhead**
-   - Creating and scheduling tasks has overhead
-   - For simple computations, overhead may exceed benefit
-   - This is expected and demonstrates real-world parallel computing challenges
+2. **Parallelization Overhead**
+   - OpenMP task creation and scheduling
+   - Thread synchronization (`#pragma omp atomic`)
+   - Cache coherency between CPU cores
+   - Memory access coordination
 
-3. **Synchronization cost**
-   - Atomic operations have overhead
-   - Cache coherency traffic between cores
-   - May slow down parallel version
+3. **Small Problem Size**
+   - N = 10,000,000 completes in ~0.012 seconds
+   - Overhead cannot be amortized
+   - Problem is not large enough to benefit from parallelism
 
-### Typical Results
+4. **Overhead vs. Benefit**
+   ```
+   Parallel benefit: ~0.012s / 4 threads = 0.003s
+   Parallel overhead: ~0.010s (task management, sync)
+   Net gain: 0.003s - 0.010s = -0.007s (slower!)
+   ```
 
-```
-Sequential: ~0.012 seconds
-Parallel:   ~0.012 seconds (similar or slightly slower)
-```
+### Educational Value
 
-This is **expected behavior** for this problem size and complexity. It demonstrates that parallelization is not always beneficial and must be carefully considered based on:
-- Problem size
-- Computational complexity per iteration
-- Overhead vs. benefit trade-off
+This result is **valuable** because it demonstrates:
+- Parallelization is not always beneficial
+- Need to analyze problem characteristics before applying parallel techniques
+- Overhead analysis is crucial in parallel computing
+- Simple problems may run faster sequentially
 
-### Optimization Considerations
+### When Would Parallel Be Faster?
 
-To potentially improve parallel performance:
-1. **Larger problem size**: Increase N to amortize task overhead
-2. **Fewer tasks**: Use fewer blocks with more work per task
-3. **Manual reduction**: Use private arrays and reduce at end
-4. **Different parallel pattern**: Consider `#pragma omp parallel for reduction`
+Parallel versions excel when:
+- **Larger problem size**: N = 1,000,000,000 or more
+- **Complex computations**: Heavy mathematical operations per iteration
+- **Computation > Overhead**: When calculation time significantly exceeds parallelization overhead
 
 ---
 
@@ -372,13 +370,31 @@ OPENMP_FLAG = -fopenmp
 
 ```
 PPSC-test/
-├── harmonic_sum.cpp    # Main source code with detailed comments
-├── Makefile           # Build system with multiple targets
-├── README.md          # This documentation file
-├── techology.md       # Technical specification (Chinese)
-├── harmonic_seq       # Sequential executable (after build)
-└── harmonic_par       # Parallel executable (after build)
+├── harmonic_sum.cpp    # Main source code with detailed English comments
+├── Makefile           # Simple build system
+├── README.md          # This documentation
+├── harmonic_seq       # Sequential executable (after compilation)
+└── harmonic_par       # Parallel executable (after compilation)
 ```
+
+---
+
+## Key Features
+
+### 1. Reverse Summation for Precision
+Both versions sum from N down to 1 to minimize floating-point errors by accumulating smaller values first.
+
+### 2. OpenMP Task Mechanism
+The parallel version uses `#pragma omp task` as required by Variant 9, demonstrating proper task-based parallelism.
+
+### 3. Thread-Safe Operations
+Uses `#pragma omp atomic` for safe concurrent updates to shared variables.
+
+### 4. High-Precision Timing
+Utilizes `std::chrono::steady_clock` for accurate performance measurement.
+
+### 5. Detailed English Comments
+Every function and key code section includes comprehensive English documentation.
 
 ---
 
@@ -386,29 +402,28 @@ PPSC-test/
 
 ### OpenMP Not Found
 
-If you get "openmp not found" errors:
+If compilation fails with OpenMP errors:
 
 ```bash
 # Ubuntu/Debian
 sudo apt-get install libomp-dev
 
-# macOS (with Homebrew)
+# macOS with Homebrew
 brew install libomp
 ```
 
-### Different Results Between Runs
+### Compilation Errors
 
-Small variations in decimal places (especially beyond 15 digits) are normal due to:
+Ensure you have:
+- GCC 4.9+ or Clang 3.7+ (for C++11 and OpenMP support)
+- Make utility installed
+
+### Result Variations
+
+Small differences in the last few decimal places between runs are normal due to:
 - Floating-point arithmetic precision limits
 - Different summation orders in parallel execution
-- IEEE 754 double precision limitations
-
-### Performance Issues
-
-If parallel version is significantly slower:
-- This is expected for this problem!
-- Try adjusting `NUM_THREADS` to match your CPU cores
-- Consider the problem size vs. overhead trade-off
+- IEEE 754 double precision constraints (15-17 significant digits)
 
 ---
 
