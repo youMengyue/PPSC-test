@@ -1,5 +1,6 @@
 # Harmonic Series Summation - Parallel Computing Project
 
+**Author:** Fan Zhanhong  
 **Student ID:** 58  
 **Variant:** 9 (OpenMP with task mechanism)  
 **Programming Language:** C++  
@@ -120,6 +121,7 @@ make run-seq
 ================================================
 Harmonic Series Summation Program
 ================================================
+Author: Fan Zhanhong
 Student ID: 58
 Variant: 9 (OpenMP with task mechanism)
 Number of terms (N): 10000000
@@ -147,6 +149,7 @@ make run-par
 ================================================
 Harmonic Series Summation Program
 ================================================
+Author: Fan Zhanhong
 Student ID: 58
 Variant: 9 (OpenMP with task mechanism)
 Number of terms (N): 10000000
@@ -431,6 +434,7 @@ If parallel version is significantly slower:
 
 ## Author
 
+**Name:** Fan Zhanhong  
 **Student ID:** 58  
 **Course:** Parallel and Distributed Computing  
 **Assignment:** Variant 9 - OpenMP Task Mechanism  

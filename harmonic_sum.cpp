@@ -1,6 +1,7 @@
 /**
  * Harmonic Series Summation Program
  * 
+ * Author: Fan Zhanhong
  * Student ID: 58
  * Variant: 9 (OpenMP with task mechanism)
  * 
@@ -148,6 +149,7 @@ int main() {
     std::cout << "================================================" << std::endl;
     std::cout << "Harmonic Series Summation Program" << std::endl;
     std::cout << "================================================" << std::endl;
+    std::cout << "Author: Fan Zhanhong" << std::endl;
     std::cout << "Student ID: 58" << std::endl;
     std::cout << "Variant: 9 (OpenMP with task mechanism)" << std::endl;
     std::cout << "Number of terms (N): " << N << std::endl;
